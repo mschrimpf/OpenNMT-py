@@ -41,7 +41,7 @@ def build_translator(opt, report_score=True, logger=None, out_file=None):
                         "stepwise_penalty", "block_ngram_repeat",
                         "ignore_when_blocking", "dump_beam", "report_bleu",
                         "data_type", "replace_unk", "gpu", "verbose", "fast"]}
-
+    
     translator = Translator(model, fields, global_scorer=scorer,
                             out_file=out_file, report_score=report_score,
                             copy_attn=model_opt.copy_attn, logger=logger,
@@ -286,6 +286,66 @@ class Translator(object):
             json.dump(self.translator.beam_accum,
                       codecs.open(self.dump_beam, 'w', 'utf-8'))
         return all_scores, all_predictions
+
+    #TODO
+    def get_encodings(self,
+                  src_path=None,
+                  src_data_iter=None,
+                  tgt_path=None,
+                  tgt_data_iter=None,
+                  src_dir=None,
+                  batch_size=None,
+                  attn_debug=False):
+        assert src_data_iter is not None or src_path is not None
+
+        if batch_size is None:
+            raise ValueError("batch_size must be set")
+        data = inputters.build_dataset(self.fields,
+                                       self.data_type,
+                                       src_path=src_path, #PATH TO INPUT FILE
+                                       src_data_iter=src_data_iter, #NONE
+                                       tgt_path=tgt_path, #NONE
+                                       tgt_data_iter=tgt_data_iter, #NONE
+                                       src_dir=src_dir, # empty string ""
+                                       sample_rate=self.sample_rate,
+                                       window_size=self.window_size,
+                                       window_stride=self.window_stride,
+                                       window=self.window,
+                                       use_filter_pred=self.use_filter_pred)
+
+        if self.cuda:
+            cur_device = "cuda"
+        else:
+            cur_device = "cpu"
+
+        data_iter = inputters.OrderedIterator(
+            dataset=data, device=cur_device,
+            batch_size=batch_size, train=False, sort=False,
+            sort_within_batch=True, shuffle=False)
+
+        all_encodings = []
+
+        for batch in data_iter:
+            batch_data = self.Encode(batch, data)
+            all_encodings.append(batch_data)
+            print(batch_data)
+        return all_encodings
+
+    #TODO
+    def Encode(self, batch, data):
+        # (0) Prep each of the components of the search.
+        # And helper method for reducing verbosity.
+        data_type = data.data_type
+        
+        # (1) Run the encoder on the src.
+        src = inputters.make_features(batch, 'src', data_type)
+        src_lengths = None
+        if data_type == 'text':
+            _, src_lengths = batch.src
+
+        enc_states, memory_bank = self.model.encoder(src, src_lengths)
+        sized_enc_states = enc_states.view(1,-1).detach()
+        return sized_enc_states.numpy()
 
     def translate_batch(self, batch, data, fast=False):
         """
@@ -594,7 +654,7 @@ class Translator(object):
         ret["batch"] = batch
 
         return ret
-
+        
     def _from_beam(self, beam):
         ret = {"predictions": [],
                "scores": [],

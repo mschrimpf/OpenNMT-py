@@ -407,20 +407,23 @@ def train_opts(parser):
 def translate_opts(parser):
     """ Translation / inference options """
     group = parser.add_argument_group('Model')
-    group.add_argument('-model', required=True,
+    #TODO replace with model
+    group.add_argument('-model', default="averaged-10-epoch.pt",
                        help='Path to model .pt file')
 
     group = parser.add_argument_group('Data')
     group.add_argument('-data_type', default="text",
                        help="Type of the source input. Options: [text|img].")
 
-    group.add_argument('-src', required=True,
+    #TODO replace with source
+    group.add_argument('-src', default="data/temp_src.txt",
                        help="""Source sequence to decode (one line per
                        sequence)""")
     group.add_argument('-src_dir', default="",
                        help='Source directory for image or audio files')
     group.add_argument('-tgt',
                        help='True target sequence (optional)')
+
     group.add_argument('-output', default='pred.txt',
                        help="""Path to output the predictions (each line will
                        be the decoded sequence""")
@@ -495,6 +498,7 @@ def translate_opts(parser):
                        decoded sentences""")
 
     group = parser.add_argument_group('Efficiency')
+
     group.add_argument('-batch_size', type=int, default=30,
                        help='Batch size')
     group.add_argument('-gpu', type=int, default=-1,
