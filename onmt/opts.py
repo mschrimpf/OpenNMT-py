@@ -404,11 +404,11 @@ def train_opts(parser):
                        help="Window size for spectrogram in seconds.")
 
 
-def translate_opts(parser):
+def translate_opts(parser, weights):
     """ Translation / inference options """
     group = parser.add_argument_group('Model')
     #TODO replace with model
-    group.add_argument('-model', default="models/transformer/averaged-10-epoch.pt",
+    group.add_argument('-model', default=weights,
                        help='Path to model .pt file')
 
     group = parser.add_argument_group('Data')
