@@ -287,7 +287,6 @@ class Translator(object):
                       codecs.open(self.dump_beam, 'w', 'utf-8'))
         return all_scores, all_predictions
 
-    #TODO
     def get_encodings(self,
                   src_path=None,
                   src_data_iter=None,
@@ -331,7 +330,6 @@ class Translator(object):
             print(batch_data)
         return all_encodings
 
-    #TODO
     def Encode(self, batch, data):
         # (0) Prep each of the components of the search.
         # And helper method for reducing verbosity.

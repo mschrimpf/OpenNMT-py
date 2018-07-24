@@ -408,15 +408,14 @@ def translate_opts(parser):
     """ Translation / inference options """
     group = parser.add_argument_group('Model')
     #TODO replace with model
-    group.add_argument('-model', default="averaged-10-epoch.pt",
+    group.add_argument('-model', default="models/transformer/averaged-10-epoch.pt",
                        help='Path to model .pt file')
 
     group = parser.add_argument_group('Data')
     group.add_argument('-data_type', default="text",
                        help="Type of the source input. Options: [text|img].")
 
-    #TODO replace with source
-    group.add_argument('-src', default="data/temp_src.txt",
+    group.add_argument('-src', default="/Users/mac/Desktop/nlp/neural-nlp/sentences.txt",
                        help="""Source sequence to decode (one line per
                        sequence)""")
     group.add_argument('-src_dir', default="",
