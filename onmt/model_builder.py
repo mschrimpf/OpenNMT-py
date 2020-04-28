@@ -124,7 +124,7 @@ def build_decoder(opt, embeddings):
                              opt.reuse_copy_attn)
 
 
-def load_test_model(opt, dummy_opt):
+def load_test_model(opt, dummy_opt, untrained=False):
     """ Load model for Inference """
     checkpoint = torch.load(opt.model,
                             map_location=lambda storage, loc: storage)
@@ -135,7 +135,7 @@ def load_test_model(opt, dummy_opt):
     for arg in dummy_opt:
         if arg not in model_opt:
             model_opt.__dict__[arg] = dummy_opt[arg]
-    model = build_base_model(model_opt, fields, use_gpu(opt), checkpoint)
+    model = build_base_model(model_opt, fields, use_gpu(opt), checkpoint if not untrained else None)
     model.eval()
     model.generator.eval()
     return fields, model, model_opt

@@ -17,7 +17,7 @@ import onmt.inputters as inputters
 import onmt.opts as opts
 
 
-def build_translator(opt, report_score=True, logger=None, out_file=None):
+def build_translator(opt, report_score=True, logger=None, out_file=None, untrained=False):
     if out_file is None:
         out_file = codecs.open(opt.output, 'w+', 'utf-8')
 
@@ -29,7 +29,7 @@ def build_translator(opt, report_score=True, logger=None, out_file=None):
     dummy_opt = dummy_parser.parse_known_args([])[0]
 
     fields, model, model_opt = \
-        onmt.model_builder.load_test_model(opt, dummy_opt.__dict__)
+        onmt.model_builder.load_test_model(opt, dummy_opt.__dict__, untrained=untrained)
 
     scorer = onmt.translate.GNMTGlobalScorer(opt.alpha,
                                              opt.beta,
