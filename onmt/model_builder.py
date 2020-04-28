@@ -217,7 +217,7 @@ def build_base_model(model_opt, fields, gpu, checkpoint=None):
                 p.data.uniform_(-model_opt.param_init, model_opt.param_init)
             for p in generator.parameters():
                 p.data.uniform_(-model_opt.param_init, model_opt.param_init)
-        if model_opt.param_init_glorot:
+        if hasattr(model_opt, 'param_init_glorot') and model_opt.param_init_glorot:
             for p in model.parameters():
                 if p.dim() > 1:
                     xavier_uniform_(p)
